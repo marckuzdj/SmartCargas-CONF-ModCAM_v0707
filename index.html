@@ -602,7 +602,7 @@
           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 11.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
       </div>
-      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga vModCAM+Cleaner_0707.7</h2>
+      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga vModCAM_0707.X</h2>
       <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Selecione o estado de operação em doca</p>
     </div>
 
@@ -626,7 +626,7 @@
          <!-- <option value="MG">Minas Gerais (MG)</option>  -->
          <!-- <option value="PA">Pará (PA)</option>  -->
          <!-- <option value="PB">Paraíba (PB)</option>  -->
-         <!-- <option value="PR">Paraná (PR)</option>  -->
+          <option value="PR">Paraná (PR)</option>
          <!-- <option value="PE">Pernambuco (PE)</option>  -->
          <!-- <option value="PI">Piauí (PI)</option>  -->
          <!-- <option value="RJ">Rio de Janeiro (RJ)</option>  -->
@@ -972,7 +972,7 @@ const SCRIPTS_POR_UF = {
   // "MG": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
   // "PA": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
   // "PB": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
- // "PR": "https://script.google.com/macros/s/AKfycbz_VNwjmQ9hv3LkL5WHl2luVWZkrquNKPnPCXCyTXo4bYG8oSCTIqEtnCIIKt9fQtovrA/exec",
+  "PR": "https://script.google.com/macros/s/AKfycbz_VNwjmQ9hv3LkL5WHl2luVWZkrquNKPnPCXCyTXo4bYG8oSCTIqEtnCIIKt9fQtovrA/exec",
   // "PE": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
   // "PI": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
   // "RJ": "https://script.google.com/macros/s/AKfycbxeW2tRPFpnompPApN4XxeY2DWnZLoIzmzenf8zEdOXctNgtrw-l71ZLGn6QpTOTZkc/exec",
@@ -2653,48 +2653,7 @@ async function registrarIntercorrencia() {
 
 
 // Função essencial para permitir o próximo romaneio sem recarregar a página
-// Função essencial para permitir o próximo romaneio sem recarregar a página
-async function resetarInterface() { // NOTA: Transformada em async para aguardar a parada física da câmera
-  
-  // =========================================================================
-  // ⚡ INJEÇÃO CIRÚRGICA: EXPURGO FÍSICO DO HARDWARE (CÂMERA, LANTERNA E FOCO USB)
-  // =========================================================================
-  console.log("🧹 [RESET HARDWARE] Encerrando motores de captura de código de barras...");
-  
-  // 1. Limpa o monitoramento de foco do teclado (USB Desktop) e remove EventListeners
-  if (typeof limparMonitoramentoUSB === "function") {
-      limparMonitoramentoUSB();
-  }
-
-  // 2. Desliga a câmera e força o desligamento imediato da Lanterna (Torch)
-  if (typeof html5QrCode !== "undefined" && html5QrCode) {
-      try {
-          if (html5QrCode.isScanning) {
-              // Força o desligamento da lanterna antes de matar o fluxo de vídeo
-              try {
-                  await html5QrCode.applyVideoConstraints({
-                      "torch": false,
-                      advanced: [{ "torch": false }]
-                  });
-              } catch (e) {
-                  console.warn("[RESET HW] Lanterna já desligada ou inacessível.");
-              }
-              // Para a captura de frames da câmera
-              await html5QrCode.stop();
-          }
-          // Limpa o canvas interno e limpa a memória RAM de vídeo guardada pela biblioteca
-          await html5QrCode.clear(); 
-          console.log("✓ [RESET HW] Fluxo de vídeo e buffers da câmera purificados.");
-      } catch (err) {
-          console.error("❌ [RESET HW] Erro ao desligar recursos de hardware:", err);
-      }
-  }
-
-  // 3. Remove o botão visual da lanterna flutuante do HTML para evitar acúmulo de lixo
-  const antigoBtn = document.getElementById("btnFlashIcon");
-  if (antigoBtn) antigoBtn.remove();
-  // =========================================================================
-
+function resetarInterface() {
   // =========================================================================
   // ⚡ INJEÇÃO CIRÚRGICA: RASTREAMENTO E DESATIVAÇÃO DO MODO ULTRA PERFORMANCE
   // =========================================================================
@@ -2857,47 +2816,54 @@ async function resetarInterface() { // NOTA: Transformada em async para aguardar
     if (btnFinalizarLote) {
         btnFinalizarLote.style.display = "block"; 
         btnFinalizarLote.disabled = false;        
-btnFinalizarLote.innerText = "Finalizar Lote";
-btnFinalizarLote.style.backgroundColor = "";
+        btnFinalizarLote.innerText = "Finalizar Lote";
+        btnFinalizarLote.style.backgroundColor = ""; 
+    }
+
+    const btnIniciar = document.getElementById("btnIniciar");
+    if (btnIniciar) {
+        btnIniciar.disabled = false;
+        btnIniciar.style.display = "block";
+        btnIniciar.innerText = "Iniciar Conferência";
+    }
+
+    // 10. GATILHO FINAL: RESTAURA O ESTADO INICIAL DA BARRA DE PROGRESSO
+    // Removido o "important" para não travar a visibilidade no próximo romaneio
+    const containerProgresso = document.getElementById("progresso-lote") || document.querySelector(".progress-container");
+    if (containerProgresso) {
+        containerProgresso.style.display = "block"; 
+    }
+
+    // Força o reset visual (0 / 0 Pedidos) e a cor cinza
+    if (typeof atualizarBarraProgresso === "function") {
+        atualizarBarraProgresso(0); 
+    }
+
+    // --- DESTRAVA DA ASSINATURA ---
+    if (areaAss) {
+        areaAss.style.opacity = "1";           // Restaura visibilidade
+        areaAss.style.pointerEvents = "auto";  // DESTRAVA O TOQUE/DESENHO
+    }
+
+    // Se tiver um canvas específico
+    const elCanvas = document.getElementById('canvasAssinatura');
+    if (elCanvas) {
+        elCanvas.style.pointerEvents = "auto";
+    }
+
+    // ==========================================================================
+    // 🩹 PASSO 2.3: HARD CLEAN DO MODAL DETALHES (ANTI-FANTASMAS EM NOVO LOTE)
+    // ==========================================================================
+    const modalDoca = document.getElementById('modalDetalhesRomaneio');
+    const tbodyDoca = document.getElementById('tbodyDetalhesCarga');
+    if (modalDoca) modalDoca.style.display = 'none'; // Fecha o modal fisicamente []
+    if (tbodyDoca) tbodyDoca.innerHTML = "";        // Limpa a RAM do celular []
+    // ==========================================================================
+
+    console.log("🏁 Reset completo: Interface limpa e barra de progresso pronta.");
+    dispararLogConf("INTERFACE_RESET_COMPLETO", "Reset completo: Interface limpa e barra de progresso pronta.");
 }
-const btnIniciar = document.getElementById("btnIniciar");
-if (btnIniciar) {
-btnIniciar.disabled = false;
-btnIniciar.style.display = "block";
-btnIniciar.innerText = "Iniciar Conferência";
-}
-// 10. GATILHO FINAL: RESTAURA O ESTADO INICIAL DA BARRA DE PROGRESSO
-const containerProgresso = document.getElementById("progresso-lote") || document.querySelector(".progress-container");
-if (containerProgresso) {
-containerProgresso.style.display = "block";
-}
-// Força o reset visual (0 / 0 Pedidos) e a cor cinza
-if (typeof atualizarBarraProgresso === "function") {
-atualizarBarraProgresso(0);
-}
-// --- DESTRAVA DA ASSINATURA ---
-if (areaAss) {
-areaAss.style.opacity = "1"; // Restaura visibilidade
-areaAss.style.pointerEvents = "auto"; // DESTRAVA O TOQUE/DESENHO
-}
-// Se tiver um canvas específico
-const elCanvas = document.getElementById('canvasAssinatura');
-if (elCanvas) {
-elCanvas.style.pointerEvents = "auto";
-}
-// ==========================================================================
-// 🩹 PASSO 2.3: HARD CLEAN DO MODAL DETALHES (ANTI-FANTASMAS EM NOVO LOTE)
-// ==========================================================================
-const modalDoca = document.getElementById('modalDetalhesRomaneio');
-const tbodyDoca = document.getElementById('tbodyDetalhesCarga');
-if (modalDoca) modalDoca.style.display = 'none'; // Fecha o modal fisicamente []
-if (tbodyDoca) tbodyDoca.innerHTML = ""; // Limpa a RAM do celular []
-// ==========================================================================
-console.log("🏁 Reset completo: Interface limpa e barra de progresso pronta.");
-if (typeof dispararLogConf === "function") {
-dispararLogConf("INTERFACE_RESET_COMPLETO", "Reset completo: Interface limpa e barra de progresso pronta.");
-}
-}
+
 
 
 async function prepararFaseAssinatura(btn, areaAssinatura) {
@@ -5017,7 +4983,7 @@ function fecharAoClicarFora(event) {
 		</div>
 
         <h3>Contatar Administradores</h3>
-        <p class="nu-subtitle">Escolha um dos nossos canais oficiais para suporte:</p>
+        <p class="nu-subtitle">Escolha um dos nossos canais oficiais abaixo para suporte:</p>
         
         <div class="suporte-links-container">
             
@@ -5032,7 +4998,7 @@ function fecharAoClicarFora(event) {
                     <a href="https://wa.me." target="_blank" class="nu-btn nu-zap">
                         💬 WhatsApp
                     </a>
-                    <a href="mailto:marcos.asouza@telefonica.com" class="nu-btn nu-mail">
+                    <a href="mailto:marcos.asouza@://telefonica.com" class="nu-btn nu-mail">
                         📧 E-mail
                     </a>
                 </div>
