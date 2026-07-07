@@ -602,7 +602,7 @@
           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 11.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
       </div>
-      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga vModCAM_0707.3</h2>
+      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga vModCAM_0707.4</h2>
       <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Selecione o estado de operação em doca</p>
     </div>
 
@@ -1217,7 +1217,7 @@ async function iniciarConferencia() {
             // Define o texto de status padrão abaixo do leitor
             statusInfo.innerText = "Aguardando leitura pela câmera...";
 
-            // Remove o botão antigo se ele já existir por algum motivo
+            // Remove o botão antigo se ele já existir para evitar duplicados
             const antigoBtn = document.getElementById("btnFlashIcon");
             if (antigoBtn) antigoBtn.remove();
 
@@ -1225,29 +1225,39 @@ async function iniciarConferencia() {
             const btnFlash = document.createElement("button");
             btnFlash.id = "btnFlashIcon";
             btnFlash.type = "button";
-            btnFlash.innerHTML = "🔦"; // Ícone de lanterna limpo
+            btnFlash.innerHTML = "🔦"; 
             btnFlash.title = "Ligar/Desligar Lanterna";
             readerDiv.appendChild(btnFlash);
 
-            // LÓGICA DE CONTROLE DA LANTERNA
             let flashAtivo = false;
+            
+            // LÓGICA CORRIGIDA: Captura as capacidades do hardware no momento do clique
             btnFlash.onclick = async (e) => {
-                e.stopPropagation(); // Evita cliques fantasmas no leitor
+                e.stopPropagation(); 
+                
                 try {
+                    // 1. Busca os recursos da câmera ativa NESTE exato momento
                     const cameraCapabilities = html5QrCode.getCameraCapabilities();
-                    if (cameraCapabilities.torch) {
+                    
+                    // 2. Verifica se a lanterna (torch) é suportada pelo navegador/aparelho
+                    if (cameraCapabilities && cameraCapabilities.torch) {
                         flashAtivo = !flashAtivo;
+                        
+                        // 3. Aplica a configuração diretamente no hardware de vídeo ativo
                         await html5QrCode.applyVideoConstraints({
                             advanced: [{ torch: flashAtivo }]
                         });
-                        // Muda o visual do ícone para indicar o estado
+                        
+                        // 4. Atualiza o visual do botão na tela
                         btnFlash.innerHTML = flashAtivo ? "❌" : "🔦";
                         btnFlash.classList.toggle("ativo", flashAtivo);
                     } else {
-                        alert("A lanterna não é suportada neste dispositivo/navegador.");
+                        // Alerta amigável caso o navegador bloqueie ou o celular não tenha flash traseiro
+                        alert("A lanterna não está disponível ou não é suportada neste navegador/dispositivo.");
                     }
                 } catch (err) {
-                    console.error("Erro ao controlar lanterna:", err);
+                    console.error("Erro ao aplicar restrição de lanterna:", err);
+                    alert("Não foi possível acionar a lanterna. Tente novamente.");
                 }
             };
 
