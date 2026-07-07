@@ -93,15 +93,17 @@
         .link-sec { display: block; text-align: center; color: var(--nu-purple); text-decoration: none; font-size: 13px; margin-top: 15px; font-weight: 600; }
         
         /* Estilos do App de Conferência (originais do PDF) */
-        #reader {
-                width: 100%;
-                min-height: 250px;
-                background-color: #1a1a1a;
-                border-radius: 12px;
-                overflow: hidden;
-            }
-
-		/* Adicione este bloco NOVO logo abaixo do seu */
+		/* Seu bloco principal atualizado com position relative */
+		#reader {
+		    width: 100%;
+		    min-height: 250px;
+		    background-color: #1a1a1a;
+		    border-radius: 12px;
+		    overflow: hidden;
+		    position: relative; /* Mantido para alinhar a linha vermelha e o botão */
+		}
+		
+		/* Sua mira laser vermelha predileta */
 		#reader::after {
 		    content: "";
 		    position: absolute;
@@ -109,11 +111,44 @@
 		    left: 5%;
 		    width: 90%;
 		    height: 2px;
-		    background-color: rgba(255, 0, 0, 0.7); /* Linha vermelha viva */
-		    box-shadow: 0 0 6px rgba(255, 0, 0, 0.9); /* Efeito de brilho laser */
-		    pointer-events: none; /* Garante que não bloqueia cliques na tela */
-		    z-index: 10; /* Garante que a linha fica por cima do vídeo da câmera */
+		    background-color: rgba(255, 0, 0, 0.7);
+		    box-shadow: 0 0 6px rgba(255, 0, 0, 0.9);
+		    pointer-events: none;
+		    z-index: 10;
 		}
+		
+		/* NOVO: Estilização do ícone da Lanterna Flutuante */
+		#btnFlashIcon {
+		    position: absolute;
+		    top: 16px;
+		    right: 16px;
+		    width: 44px;
+		    height: 44px;
+		    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente chique */
+		    color: white;
+		    border: 1px solid rgba(255, 255, 255, 0.2);
+		    border-radius: 50%; /* Botão perfeitamente redondo */
+		    font-size: 20px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    cursor: pointer;
+		    z-index: 20; /* Fica acima do vídeo e da linha vermelha */
+		    transition: all 0.2s ease;
+		    backdrop-filter: blur(4px); /* Desfoca levemente o fundo (estilo iOS/Premium) */
+		}
+		
+		/* Visual alternativo quando a lanterna estiver ligada */
+		#btnFlashIcon.ativo {
+		    background-color: #e53935; /* Vermelho suave para indicar o cancelamento/desligar */
+		    border-color: transparent;
+		    box-shadow: 0 0 10px rgba(229, 57, 53, 0.5);
+		}
+		
+		#btnFlashIcon:active {
+		    transform: scale(0.92); /* Efeito tátil de clique */
+		}
+
 		
 
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -567,7 +602,7 @@
           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 11.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
       </div>
-      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga vModCAM_0707.2</h2>
+      <h2 style="color: #8A05BE; margin: 0; font-size: 22px; font-weight: bold;">Conferência de Carga vModCAM_0707.3</h2>
       <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Selecione o estado de operação em doca</p>
     </div>
 
@@ -1172,51 +1207,54 @@ async function iniciarConferencia() {
 	        aspectRatio: 1.0 
 	    };
 	
-	    try {
-	        await html5QrCode.start(
-	            { facingMode: "environment" }, 
-	            config, 
-	            (decodedText) => { onScanSuccess(decodedText); }
-	        );
-	        
-	        statusInfo.innerHTML = `
-	            <div style="color: #ff9800; font-weight: bold; margin-bottom: 8px;">
-	                ⚠️ Evite fazer sombra sobre o código! Afaste um pouco o celular.
-	            </div>
-	            <button id="btnFlash" type="button" style="padding: 8px 16px; background: #333; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
-	                🔦 Ligar Lanterna
-	            </button>
-	        `;
-	
-	        // ALTERAÇÃO 2: Lógica para ligar/desligar o Flash (Lanterna) contra sombras
-	        setTimeout(() => {
-	            const btnFlash = document.getElementById("btnFlash");
-	            if (btnFlash) {
-	                let flashAtivo = false;
-	                btnFlash.onclick = async () => {
-	                    try {
-	                        const cameraCapabilities = html5QrCode.getCameraCapabilities();
-	                        if (cameraCapabilities.torch) {
-	                            flashAtivo = !flashAtivo;
-	                            await html5QrCode.applyVideoConstraints({
-	                                advanced: [{ torch: flashAtivo }]
-	                            });
-	                            btnFlash.innerText = flashAtivo ? "❌ Desligar Lanterna" : "🔦 Ligar Lanterna";
-	                            btnFlash.style.background = flashAtivo ? "#d32f2f" : "#333";
-	                        } else {
-	                            alert("A lanterna não é suportada neste navegador/dispositivo.");
-	                        }
-	                    } catch (err) {
-	                        console.error("Erro ao controlar lanterna:", err);
-	                    }
-	                };
-	            }
-	        }, 500);
-	
-	    } catch (err) {
-	        btnIniciar.style.display = "block";
-	        alert("Erro na câmera. Verifique as permissões.");
-	    }
+        try {
+            await html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                (decodedText) => { onScanSuccess(decodedText); }
+            );
+            
+            // Define o texto de status padrão abaixo do leitor
+            statusInfo.innerText = "Aguardando leitura pela câmera...";
+
+            // Remove o botão antigo se ele já existir por algum motivo
+            const antigoBtn = document.getElementById("btnFlashIcon");
+            if (antigoBtn) antigoBtn.remove();
+
+            // CRIA O BOTÃO DE ÍCONE INTERNO DENTRO DO #READER
+            const btnFlash = document.createElement("button");
+            btnFlash.id = "btnFlashIcon";
+            btnFlash.type = "button";
+            btnFlash.innerHTML = "🔦"; // Ícone de lanterna limpo
+            btnFlash.title = "Ligar/Desligar Lanterna";
+            readerDiv.appendChild(btnFlash);
+
+            // LÓGICA DE CONTROLE DA LANTERNA
+            let flashAtivo = false;
+            btnFlash.onclick = async (e) => {
+                e.stopPropagation(); // Evita cliques fantasmas no leitor
+                try {
+                    const cameraCapabilities = html5QrCode.getCameraCapabilities();
+                    if (cameraCapabilities.torch) {
+                        flashAtivo = !flashAtivo;
+                        await html5QrCode.applyVideoConstraints({
+                            advanced: [{ torch: flashAtivo }]
+                        });
+                        // Muda o visual do ícone para indicar o estado
+                        btnFlash.innerHTML = flashAtivo ? "❌" : "🔦";
+                        btnFlash.classList.toggle("ativo", flashAtivo);
+                    } else {
+                        alert("A lanterna não é suportada neste dispositivo/navegador.");
+                    }
+                } catch (err) {
+                    console.error("Erro ao controlar lanterna:", err);
+                }
+            };
+
+        } catch (err) {
+            btnIniciar.style.display = "block";
+            alert("Erro na câmera. Verifique as permissões.");
+        }
 	} else {
         // --- ROTINA DESKTOP (LEITOR USB) ---
         readerDiv.style.display = "none";
