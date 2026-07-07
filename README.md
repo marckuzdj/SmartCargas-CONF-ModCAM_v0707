@@ -1,0 +1,1 @@
+# SmartCargas-CONF-ModCAM_v0707
